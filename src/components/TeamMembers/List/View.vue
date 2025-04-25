@@ -143,6 +143,11 @@ const setDefautData = ((): void => {
   getTeamMemebrs();
 })();
 
+
+defineExpose({
+  getTeamMemebrs,
+  onFilterUpdate
+});
 </script>
 <style lang="scss">
 @import '@/assets/scss/variables.scss';
