@@ -1,118 +1,118 @@
 <template>
-  <div class="page-title">
-    <div class="text-h5">Team Member Directory</div>
-  </div>
-  <div class="page-content">
-    <q-virtual-scroll
-      style="max-height: 300px"
-      :items="heavyList"
-      separator
-      v-slot="{ item, index }"
-    >
-      <q-item :key="index" dense>
-        <q-item-section>
-          <q-item-label> #{{ index }} - debug {{ item.label }} </q-item-label>
-        </q-item-section>
-      </q-item>
-    </q-virtual-scroll>
-    <Filter
-      :service="service"
-      :data="teamMembersList"
-      :loading="filterLoading"
-      @update="onFilterUpdate"
-    />
-    <q-virtual-scroll
-      ref="virtualScrollRef"
-      :items="mockTeamMembers"
-      :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
-      class="page-items"
-      :class="gridType"
-      :key="rerender"
-    >
-      <template #default="scope">
-        <div
-          v-if="scope?.item && !gridType === 'grid'"
-          class="row q-col-gutter-md q-mb-md"
-        >
+  <div class="tem-members__container" :key="rerender">
+    <div class="page-title">
+      <div class="text-h5">Team Member Directory</div>
+    </div>
+    <div class="page-content">
+      <Filter
+        :service="service"
+        :data="teamMembersList"
+        :loading="filterLoading"
+        @update="onFilterUpdate"
+      />
+      <!-- <q-virtual-scroll
+        ref="virtualScrollRef"
+        :items="mockTeamMembers"
+        :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
+        class="page-items"
+        :class="gridType"
+        :key="rerender"
+      >
+        <template #default="scope">
           <div
-            class="col-md-4 col-sm-6 col-xs-12"
-            v-for="member in scope.item"
-            :key="member?.id"
+            v-if="scope?.item && !gridType === 'grid'"
+            class="row q-col-gutter-md q-mb-md"
           >
-            <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
-          </div>
-        </div>
-        <div v-else-if="scope?.item">
-          <q-item
-            class="page-items__header flex justify-start items-center"
-            v-if="index === 0"
-          >
-            <div v-for="name in tableNames" :key="`th-${name}`" class="th">
-              {{ name }}
-            </div>
-          </q-item>
-          <TeamMembersItem
-            :teamMember="scope?.item"
-            :key="scope?.item?.id"
-            @show-info="onShowInfo"
-          />
-        </div>
-      </template>
-    </q-virtual-scroll>
-    <!-- <transition
-      appear
-      enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut"
-    >
-      <div class="virtual-scroll__wrapper" v-if="chunkedTeamMembers.length > 0">
-        <q-virtual-scroll          
-          ref="virtualScrollRef"
-          :items="chunkedTeamMembers"
-          :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
-          class="page-items"
-          :class="gridType"
-        >
-          <template #default="scope">
             <div
-              v-if="scope?.item && gridType === 'grid'"
-              class="row q-col-gutter-md q-mb-md"
+              class="col-md-4 col-sm-6 col-xs-12"
+              v-for="member in scope.item"
+              :key="member?.id"
             >
-              <div
-                class="col-md-4 col-sm-6 col-xs-12"
-                v-for="member in scope.item"
-                :key="member?.id"
-              >
-                <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
+              <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
+            </div>
+          </div>
+          <div v-else-if="scope?.item">
+            <q-item
+              class="page-items__header flex justify-start items-center"
+              v-if="index === 0"
+            >
+              <div v-for="name in tableNames" :key="`th-${name}`" class="th">
+                {{ name }}
               </div>
-            </div>
-            <div v-else-if="scope?.item">
-              <q-item
-                class="page-items__header flex justify-start items-center"
-                v-if="index === 0"
+            </q-item>
+            <TeamMembersItem
+              :teamMember="scope?.item"
+              :key="scope?.item?.id"
+              @show-info="onShowInfo"
+            />
+          </div>
+        </template>
+      </q-virtual-scroll> -->
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+      >
+        <div
+          class="virtual-scroll__wrapper"
+          v-show="chunkedTeamMembers.length > 0"
+        >
+          <q-virtual-scroll
+            ref="virtualScrollRef"
+            :items="mockTeamMembers"
+            :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
+            class="page-items"
+            :class="gridType"
+          >
+            <template #default="scope">
+              <div
+                v-if="scope?.item && !gridType === 'grid'"
+                class="row q-col-gutter-md q-mb-md"
               >
-                <div v-for="name in tableNames" :key="`th-${name}`" class="th">
-                  {{ name }}
+                <div
+                  class="col-md-4 col-sm-6 col-xs-12"
+                  v-for="member in scope.item"
+                  :key="member?.id"
+                >
+                  <TeamMembersItem
+                    :teamMember="member"
+                    @show-info="onShowInfo"
+                  />
                 </div>
-              </q-item>
-              <TeamMembersItem
-                :teamMember="scope?.item"
-                :key="scope?.item?.id"
-                @show-info="onShowInfo"
-              />
-            </div>
-          </template>
-        </q-virtual-scroll>
-      </div>
-    </transition> -->
-    <!-- <q-inner-loading :showing="loading">
-      <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading> -->
+              </div>
+              <div v-else-if="scope?.item">
+                <q-item
+                  class="page-items__header flex justify-start items-center"
+                  v-if="index === 0"
+                >
+                  <div
+                    v-for="name in tableNames"
+                    :key="`th-${name}`"
+                    class="th"
+                  >
+                    {{ name }}
+                  </div>
+                </q-item>
+                <TeamMembersItem
+                  :teamMember="scope?.item"
+                  :key="scope?.item?.id"
+                  @show-info="onShowInfo"
+                />
+              </div>
+            </template>
+          </q-virtual-scroll>
+        </div>
+      </transition>
+      <q-inner-loading :showing="loading">
+        <q-spinner-gears size="50px" color="primary" />
+      </q-inner-loading>
+    </div>
+    <TeamMemberInfo
+      :show="showInfo"
+      :teamMember="activeTeamMember"
+      @close="showInfo = false"
+    />
   </div>
-  <TeamMemberInfo
-    :show="showInfo"
-    :teamMember="activeTeamMember"
-    @close="showInfo = false"
-  />
 </template>
 
 <script setup lang="ts">
