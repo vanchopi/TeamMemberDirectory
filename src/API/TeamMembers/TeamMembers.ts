@@ -4,7 +4,7 @@ export default class TeamMembersApi {
   _url: string;
 
   constructor() {
-    this._url = process.env.BASE_URL;
+    this._url = "";
   }
 
   get<T = any>(url: string): Promise<T> {
