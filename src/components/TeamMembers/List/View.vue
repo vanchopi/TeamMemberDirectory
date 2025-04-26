@@ -23,7 +23,7 @@
     />
     <q-virtual-scroll
       ref="virtualScrollRef"
-      :items="chunkedTeamMembers"
+      :items="mockTeamMembers"
       :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
       class="page-items"
       :class="gridType"
@@ -31,7 +31,7 @@
     >
       <template #default="scope">
         <div
-          v-if="scope?.item && gridType === 'grid'"
+          v-if="scope?.item && !gridType === 'grid'"
           class="row q-col-gutter-md q-mb-md"
         >
           <div
@@ -134,6 +134,7 @@ import { ref as vueRef } from "vue";
 import { QVirtualScroll } from "quasar";
 import { filterBy } from "@/utils/filter";
 import { chunkArray } from "@/utils/helpers";
+import { mockTeamMembers } from "@tests/unit/__mocks__/TeamMembersService";
 
 interface Props {
   service: any;
