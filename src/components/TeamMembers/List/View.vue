@@ -21,7 +21,6 @@
         >
           <q-virtual-scroll
             v-if="chunkedTeamMembers.length > 0"
-            :key="rerender"
             ref="virtualScrollRef"
             :items="chunkedTeamMembers"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
@@ -98,7 +97,7 @@ import { ref as vueRef } from "vue";
 import { QVirtualScroll } from "quasar";
 import { filterBy } from "@/utils/filter";
 import { chunkArray } from "@/utils/helpers";
-import { mockTeamMembers } from "@tests/unit/__mocks__/TeamMembersService";
+import { getCurrentInstance } from "vue";
 
 interface Props {
   service: any;
@@ -109,6 +108,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { columnsPerRow, itemHeight } = useResponsiveGrid();
+
+const { proxy } = getCurrentInstance()!;
 
 const virtualScrollRef = vueRef<InstanceType<typeof QVirtualScroll>>();
 
@@ -167,6 +168,11 @@ const getTeamMemebrs = async (): any => {
   }
 };
 
+const forceRerenderVirtualScroll = async (): void => {
+  await nextTick();
+  proxy?.$forceUpdate();
+};
+
 onMounted(async () => {
   await getTeamMemebrs();
 });
@@ -175,9 +181,7 @@ watch(
   (): void => teamMembersList.value,
   async (): void => {
     filteredteamMembers.value = teamMembersList.value;
-    await nextTick();
-    rerender.value++;
-    await nextTick();
+    await forceRerenderVirtualScroll();
   },
   { immediate: true, deep: true }
 );
