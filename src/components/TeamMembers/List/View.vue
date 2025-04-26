@@ -1,5 +1,5 @@
 <template>
-  <div class="tem-members__container" :key="rerender">
+  <div class="tem-members__container">
     <div class="page-title">
       <div class="text-h5">Team Member Directory</div>
     </div>
@@ -20,6 +20,8 @@
           v-show="chunkedTeamMembers.length > 0"
         >
           <q-virtual-scroll
+            v-if="chunkedTeamMembers.length > 0"
+            :key="rerender"
             ref="virtualScrollRef"
             :items="chunkedTeamMembers"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
@@ -165,10 +167,6 @@ const getTeamMemebrs = async (): any => {
   }
 };
 
-// const setDefautData = ((): void => {
-//   getTeamMemebrs();
-// })();
-
 onMounted(async () => {
   await getTeamMemebrs();
 });
@@ -178,10 +176,10 @@ watch(
   async (): void => {
     filteredteamMembers.value = teamMembersList.value;
     await nextTick();
-    await nextTick();
     rerender.value++;
+    await nextTick();
   },
-  { deep: true }
+  { immediate: true, deep: true }
 );
 
 const maxSize = 10000;
