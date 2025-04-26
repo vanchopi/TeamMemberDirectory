@@ -16,6 +16,7 @@
     >
       <div class="virtual-scroll__wrapper" v-show="!loading">
         <q-virtual-scroll
+          v-if="chunkedTeamMembers.length > 0"
           ref="virtualScrollRef"
           :items="chunkedTeamMembers"
           :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
@@ -23,38 +24,32 @@
           :class="gridType"
         >
           <template #default="scope">
-            <!-- <template v-if="Array.isArray(scope.item)">
-              <div class="row q-col-gutter-md q-mb-md">
-                <div
-                  v-for="member in scope.item"
-                  :key="member?.id"
-                  class="col-md-4 col-sm-6 col-xs-12"
-                >
-                  <TeamMembersItem
-                    :teamMember="member"
-                    @show-info="onShowInfo"
-                  />
-                </div>
+            <div
+              v-if="scope?.item && gridType === 'grid'"
+              class="row q-col-gutter-md q-mb-md"
+            >
+              <div
+                class="col-md-4 col-sm-6 col-xs-12"
+                v-for="member in scope.item"
+                :key="member?.id"
+              >
+                <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
               </div>
-            </template>
-            <template v-else>
+            </div>
+            <div v-else-if="scope?.item">
               <q-item
                 class="page-items__header flex justify-start items-center"
-                v-if="scope.index === 0"
+                v-if="index === 0"
               >
                 <div v-for="name in tableNames" :key="`th-${name}`" class="th">
                   {{ name }}
                 </div>
               </q-item>
               <TeamMembersItem
-                v-if="scope.item"
-                :teamMember="scope.item"
-                :key="scope.item?.id"
+                :teamMember="scope?.item"
+                :key="scope?.item?.id"
                 @show-info="onShowInfo"
               />
-            </template> -->
-            <div style="border: 1px solid red">
-              DEBUG: {{ scope.item.name }}
             </div>
           </template>
         </q-virtual-scroll>
@@ -149,6 +144,7 @@ const getTeamMemebrs = async (): any => {
   loading.value = true;
   try {
     await store?.dispatch("teamMembers/getTeamMembers");
+    await nextTick();
   } catch (e) {
     console.log(e);
   } finally {
