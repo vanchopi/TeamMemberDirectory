@@ -14,7 +14,7 @@
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div class="virtual-scroll__wrapper" v-show="!loading">
+      <div class="virtual-scroll__wrapper">
         <q-virtual-scroll
           v-if="chunkedTeamMembers.length > 0"
           ref="virtualScrollRef"
