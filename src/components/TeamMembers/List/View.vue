@@ -9,14 +9,50 @@
       :loading="filterLoading"
       @update="onFilterUpdate"
     />
-    <transition
+    <q-virtual-scroll
+      ref="virtualScrollRef"
+      :items="chunkedTeamMembers"
+      :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
+      class="page-items"
+      :class="gridType"
+    >
+      <template #default="scope">
+        <div
+          v-if="scope?.item && gridType === 'grid'"
+          class="row q-col-gutter-md q-mb-md"
+        >
+          <div
+            class="col-md-4 col-sm-6 col-xs-12"
+            v-for="member in scope.item"
+            :key="member?.id"
+          >
+            <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
+          </div>
+        </div>
+        <div v-else-if="scope?.item">
+          <q-item
+            class="page-items__header flex justify-start items-center"
+            v-if="index === 0"
+          >
+            <div v-for="name in tableNames" :key="`th-${name}`" class="th">
+              {{ name }}
+            </div>
+          </q-item>
+          <TeamMembersItem
+            :teamMember="scope?.item"
+            :key="scope?.item?.id"
+            @show-info="onShowInfo"
+          />
+        </div>
+      </template>
+    </q-virtual-scroll>
+    <!-- <transition
       appear
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div class="virtual-scroll__wrapper">
-        <q-virtual-scroll
-          v-if="chunkedTeamMembers.length > 0"
+      <div class="virtual-scroll__wrapper" v-if="chunkedTeamMembers.length > 0">
+        <q-virtual-scroll          
           ref="virtualScrollRef"
           :items="chunkedTeamMembers"
           :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
@@ -54,10 +90,10 @@
           </template>
         </q-virtual-scroll>
       </div>
-    </transition>
-    <q-inner-loading :showing="loading">
+    </transition> -->
+    <!-- <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading>
+    </q-inner-loading> -->
   </div>
   <TeamMemberInfo
     :show="showInfo"
@@ -152,9 +188,13 @@ const getTeamMemebrs = async (): any => {
   }
 };
 
-const setDefautData = ((): void => {
-  getTeamMemebrs();
-})();
+// const setDefautData = ((): void => {
+//   getTeamMemebrs();
+// })();
+
+onMounted(async () => {
+  await getTeamMemebrs();
+});
 
 watch(
   (): void => teamMembersList.value,
