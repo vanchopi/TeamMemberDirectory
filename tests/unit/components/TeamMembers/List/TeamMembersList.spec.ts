@@ -1,94 +1,97 @@
-import { mount, flushPromises, shallowMount } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import TeamMemberList from '@/components/TeamMembers/List/View.vue';
-import TeamMembersService from '@/services/TeamMembers/TeamMembers';
-import { TeamMember, TeamMembersResponse } from '@/types/teamMembers';
-import { Quasar } from 'quasar';
-import { store } from '@/store';
+import { mount, flushPromises } from "@vue/test-utils";
+import { ref, nextTick } from "vue";
+import TeamMemberList from "@/components/TeamMembers/List/View.vue";
+import TeamMembersFilter from "@/components/TeamMembers/Filter/TeamMembersFilter.vue";
+import { TeamMember } from "@/types/teamMembers";
+import MockTeamMembersService, {
+  mockTeamMembers,
+} from "tests/unit/__mocks__/TeamMembersService";
+import { storeMock } from "tests/unit/__mocks__/storeMock";
+import { Quasar } from "quasar";
+import { useStore } from "vuex";
 
-const service = new TeamMembersService();
+jest.mock("vuex");
 
-describe('TeamMemberList', () => {
-  it('render page title', async () => {
-    const wrapper = mount(TeamMemberList, {
-      global: {
-        plugins: [[Quasar, {}], store],
+const service = new MockTeamMembersService();
+const teamMembers = ref<TeamMember[]>([]);
+
+function createMockStore() {
+  (useStore as jest.Mock).mockReturnValue({
+    state: {
+      ...storeMock,
+      teamMembers: {
+        ...storeMock.teamMembers,
+        teamMembers,
       },
-      props: {
-        service: service,
-      },
-    });
-
-    expect(wrapper.html()).toContain('Team Member Directory');
-    wrapper.unmount();
-  });
-
-  it('load team members and render items', async () => {
-    const wrapper = mount(TeamMemberList, {
-      global: {
-        plugins: [[Quasar, {}], store],
-      },
-      props: {
-        service: service,
-      },
-    });
-
-    const spy = jest.spyOn(service, 'get');
-
-    try {
-      
-      const response = await service.get<TeamMembersResponse>('team-members.json');
-      
-      await flushPromises();
-      await nextTick();
-
-      expect(spy).toHaveBeenCalled();
-
-      const cards = wrapper.findAllComponents({ name: 'TeamMembersItem' });
-
-      if (response.data.length > 0) {
-        expect(cards.length).toBeGreaterThan(0);
+    },
+    dispatch: jest.fn((action: string) => {
+      if (action === "teamMembers/getTeamMembers") {
+        return service.get().then((response) => {
+          teamMembers.value = response.data;
+        });
       }
-    } catch (error) {
-      console.error(error);
-      expect(spy).toHaveBeenCalledTimes(1);
-    }
+      return Promise.resolve();
+    }),
+  });
+}
+
+async function mountTeamMemberList() {
+  const wrapper = mount(TeamMemberList, {
+    global: {
+      plugins: [[Quasar, {}]],
+    },
+    props: { service },
+  });
+
+  await (wrapper.vm as any).getTeamMemebrs();
+  await flushPromises();
+  await nextTick();
+  await flushPromises();
+  await nextTick();
+
+  return wrapper;
+}
+
+describe("TeamMemberList", () => {
+  beforeEach(() => {
+    teamMembers.value = [];
+    createMockStore();
+  });
+
+  it("renders the page title", async () => {
+    const wrapper = await mountTeamMemberList();
+    expect(wrapper.html()).toContain("Team Member Directory");
+    wrapper.unmount();
+  });
+
+  it("loads and renders team members", async () => {
+    const wrapper = await mountTeamMemberList();
+
+    const chunkedItems = (wrapper.vm as any).chunkedTeamMembers;
+
+    expect(chunkedItems.value.length).toBeGreaterThan(0);
+    expect(chunkedItems.value.length).toBe(mockTeamMembers.length);
 
     wrapper.unmount();
   });
 
-  it('filters data on filter update', async () => {
-    const wrapper = mount(TeamMemberList, {
-      global: {
-        plugins: [[Quasar, {}], store],
-      },
-      props: {
-        service: service,
-      },
-    });
+  it("filters data on filter update", async () => {
+    const wrapper = await mountTeamMemberList();
 
-    const filterSpy = jest.spyOn(service, 'get');
+    const filterComponent = wrapper.findComponent(TeamMembersFilter);
+    expect(filterComponent.exists()).toBe(true);
 
-    try {
-      const response = await service.get<TeamMembersResponse>('team-members.json');
+    const mockFilter = { search: "Alex", department: "" };
+    await filterComponent.vm?.$emit("update", mockFilter);
+    await flushPromises();
+    await nextTick();
 
-      const mockFilter = { search: 'Alex' };
+    const chunkedItems = (wrapper.vm as any).chunkedTeamMembers;
 
-      const filterComponent = wrapper.findComponent({ search: 'Filter' });
-      filterComponent.vm.$emit('update', mockFilter);
-
-      await flushPromises();
-      await nextTick();
-
-      expect(filterSpy).toHaveBeenCalled();
-
-      const cards = wrapper.findAllComponents({ search: 'TeamMembersItem' });
-      expect(cards.length).toBeLessThanOrEqual(response.data.length); 
-
-    } catch (error) {
-      console.error(error);
-      expect(filterSpy).toHaveBeenCalledTimes(1);
-    }
+    expect(chunkedItems.value.length).toBeGreaterThan(0);
+    expect(chunkedItems.value.length).toBeLessThanOrEqual(
+      mockTeamMembers.length
+    );
 
     wrapper.unmount();
   });

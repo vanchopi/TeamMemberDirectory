@@ -29,7 +29,7 @@
           :label="getLabel(field, service?.listName)"
           v-model="filter[field]"
           input-debounce="0"
-          :options="options?.[field]"          
+          :options="options?.[field]"
         />
       </div>
     </div>
@@ -46,10 +46,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
-import { TeamMember, TeamMembersFilter } from '@/types/teamMembers';
-import {
-  getLabel,
-} from "@/utils/helpers";
+import { TeamMember, TeamMembersFilter } from "@/types/teamMembers";
+import { getLabel } from "@/utils/helpers";
 
 interface Props {
   service: any;
@@ -75,47 +73,52 @@ const dropdownFields = ref<string[]>([]);
 const options = ref<Record<string, unknown[]>>({});
 
 const gridTypes = computed<string[]>(() => {
-  return store?.state.teamMembers.gridTypes
+  return store?.state.teamMembers.gridTypes;
 });
 
 const gridType = computed<string>(() => {
-  return store?.state.teamMembers.gridType
+  return store?.state.teamMembers.gridType;
 });
 
 const onChangeGridType = (): void => {
   index.value++;
-  if(index.value > gridTypes.value.length - 1) {
+  if (index.value > gridTypes.value.length - 1) {
     index.value = 0;
   }
   store.dispatch("teamMembers/setGridType", gridTypes.value[index.value]);
-}
+};
 
 const getOptions = (field: string): string[] => {
-  const result: string[] = []
-  props.data.forEach(item => {
-    if(!result.includes(item[field])){
-      result.push(item[field]);
-    }
-  })
+  const result: string[] = [];
+  if (Array.isArray(props.data)) {
+    props.data.forEach((item) => {
+      if (!result.includes(item[field])) {
+        result.push(item[field]);
+      }
+    });
+  }
   return result;
-}
+};
 
 const setOptions = (): void => {
   const sources = props.service?.fieldSettings.options;
-  for(const prop in sources){
+  for (const prop in sources) {
     options.value[prop] = [];
     options.value[prop] = getOptions(sources[prop]);
   }
-}
+};
 
 const setDefaultFilter = (): void => {
-  filter.value = JSON.parse(JSON.stringify(props.service?.defaultFilter))
-}
+  filter.value = JSON.parse(JSON.stringify(props.service?.defaultFilter));
+};
 
 const setFilterFields = (): void => {
   inputFields.value = [...inputFields.value, ...props.service?.inputFields];
-  dropdownFields.value = [...dropdownFields.value, ...props.service?.dropdownFields];
-} 
+  dropdownFields.value = [
+    ...dropdownFields.value,
+    ...props.service?.dropdownFields,
+  ];
+};
 
 watch(
   (): void => props.data,
@@ -133,46 +136,46 @@ watch(
   { deep: true }
 );
 
-const setDefaultData = (() => {  
+const setDefaultData = (() => {
   setDefaultFilter();
   setFilterFields();
   onChangeGridType();
-})()
-
+})();
 </script>
 <style lang="scss">
-@import '@/assets/scss/variables.scss';
+@import "@/assets/scss/variables.scss";
 
-.page-filter{
+.page-filter {
   margin: 20px 0;
   padding: 14px 15px;
-  .q-btn{
+  .q-btn {
     background-color: $blue-color;
     color: white;
-    &.list{
+    &.list {
       border-color: $item-border-color;
       color: $dark-grey;
       background-color: transparent;
     }
   }
-  .row.filter__wrapper{
+  .row.filter__wrapper {
     width: 100%;
-    .q-field--dense .q-field__label{
+    .q-field--dense .q-field__label {
       top: 8px;
       color: $light-grey;
     }
   }
   .q-field--dense .q-field__marginal,
   .q-field--outlined .q-field__control,
-  .q-field--auto-height.q-field--dense .q-field__control{
+  .q-field--auto-height.q-field--dense .q-field__control {
     min-height: 30px;
     height: 30px;
   }
-  .q-field--labeled.q-field--dense .q-field__native{
+  .q-field--labeled.q-field--dense .q-field__native {
     padding-top: 8px;
     font-size: 12px;
   }
-  .q-field--auto-height.q-field--dense.q-field--labeled .q-field__control-container{
+  .q-field--auto-height.q-field--dense.q-field--labeled
+    .q-field__control-container {
     padding-top: 4px;
   }
 }

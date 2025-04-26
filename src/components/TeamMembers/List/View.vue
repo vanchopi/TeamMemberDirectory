@@ -1,11 +1,9 @@
 <template>
   <div class="page-title">
-    <div class="text-h5">
-      Team Member Directory
-    </div>
+    <div class="text-h5">Team Member Directory</div>
   </div>
   <div class="page-content">
-    <Filter 
+    <Filter
       :service="service"
       :data="teamMembersList"
       :loading="filterLoading"
@@ -22,30 +20,33 @@
           :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
           class="page-items"
           :class="gridType"
-          style="height: calc(100vh - 195px); overflow-y: auto;"
+          style="height: calc(100vh - 195px); overflow-y: auto"
         >
-          <template #default="{ item, index }">
-            <div v-if="gridType === 'grid'" class="row q-col-gutter-md q-mb-md">
-              <div class="col-md-4 col-sm-6 col-xs-12" v-for="member in item" :key="member.id">
-                <TeamMembersItem
-                  :teamMember="member"
-                  @show-info="onShowInfo"
-                />
+          <template #default="scope">
+            <div
+              v-if="scope?.item && gridType === 'grid'"
+              class="row q-col-gutter-md q-mb-md"
+            >
+              <div
+                class="col-md-4 col-sm-6 col-xs-12"
+                v-for="member in scope.item"
+                :key="member?.id"
+              >
+                <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
               </div>
             </div>
-            <div v-else>
-              <q-item class="page-items__header flex justify-start items-center" v-if="index === 0">
-                <div 
-                  v-for="name in tableNames"
-                  :key="`th-${name}`"
-                  class="th"
-                >
+            <div v-else-if="scope?.item">
+              <q-item
+                class="page-items__header flex justify-start items-center"
+                v-if="index === 0"
+              >
+                <div v-for="name in tableNames" :key="`th-${name}`" class="th">
                   {{ name }}
                 </div>
               </q-item>
               <TeamMembersItem
-                :teamMember="item"
-                :key="item.id"
+                :teamMember="scope?.item"
+                :key="scope?.item?.id"
                 @show-info="onShowInfo"
               />
             </div>
@@ -57,7 +58,7 @@
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
   </div>
-  <TeamMemberInfo 
+  <TeamMemberInfo
     :show="showInfo"
     :teamMember="activeTeamMember"
     @close="showInfo = false"
@@ -67,17 +68,24 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { useStore } from "vuex";
-import { TeamMember, TeamMembersFilter } from '@/types/teamMembers';
-import TeamMembersService from "@/services/TeamMembers/TeamMembers";
-import Filter from "@/components/TeamMembers/Filter/TeamMembersFilter";
-import TeamMembersItem from "@/components/TeamMembers/Item/TeamMembersItem";
+import { TeamMember, TeamMembersFilter } from "@/types/teamMembers";
+import Filter from "@/components/TeamMembers/Filter/TeamMembersFilter.vue";
+import TeamMembersItem from "@/components/TeamMembers/Item/TeamMembersItem.vue";
 import TeamMemberInfo from "@/components/TeamMembers/PopUps/TeamMemberInfo.vue";
-import { useResponsiveGrid } from '@/composables/useResponsiveGrid';
+import { useResponsiveGrid } from "@/composables/useResponsiveGrid";
 import { filterBy } from "@/utils/filter";
+import { chunkArray } from "@/utils/helpers";
+
+interface Props {
+  service: any;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  service: null,
+});
 
 const { columnsPerRow, itemHeight } = useResponsiveGrid();
 
-const service = new TeamMembersService();
 const store = useStore();
 
 const teamMembersList = computed<TeamMember[]>(() => {
@@ -85,13 +93,13 @@ const teamMembersList = computed<TeamMember[]>(() => {
 });
 
 const chunkedTeamMembers = computed(() => {
-  return gridType.value === 'grid'
+  return gridType.value === "grid"
     ? chunkArray(filteredteamMembers.value, columnsPerRow.value)
     : filteredteamMembers.value;
 });
 
 const gridType = computed<string>(() => {
-  return store?.state.teamMembers.gridType
+  return store?.state.teamMembers.gridType;
 });
 
 const showInfo = ref<boolean>(false);
@@ -101,18 +109,10 @@ const tableNames: string[] = ["", "Name", "Position", "Department", "Skills"];
 const loading = ref<boolean>(false);
 const filterLoading = ref<boolean>(false);
 
-const chunkArray = <T,>(arr: T[], chunkSize: number): T[][] => {
-  const result: T[][] = [];
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    result.push(arr.slice(i, i + chunkSize));
-  }
-  return result;
-};
-
 const onShowInfo = (teamMember: TeamMember): void => {
   showInfo.value = true;
   activeTeamMember.value = teamMember;
-}
+};
 
 const onFilterUpdate = (filter: TeamMembersFilter): void => {
   filterLoading.value = true;
@@ -122,17 +122,17 @@ const onFilterUpdate = (filter: TeamMembersFilter): void => {
     })
     .catch((e) => {
       console.log(e);
-    }).finally(() => {
+    })
+    .finally(() => {
       filterLoading.value = false;
-    })  
-}
+    });
+};
 
 const getTeamMemebrs = async (): any => {
   loading.value = true;
   try {
     await store?.dispatch("teamMembers/getTeamMembers");
-    filteredteamMembers.value = teamMembersList.value;
-  } catch (e) {      
+  } catch (e) {
     console.log(e);
   } finally {
     loading.value = false;
@@ -143,64 +143,72 @@ const setDefautData = ((): void => {
   getTeamMemebrs();
 })();
 
+watch(
+  (): void => teamMembersList.value,
+  (): void => {
+    filteredteamMembers.value = teamMembersList.value;
+  },
+  { deep: true }
+);
 
 defineExpose({
   getTeamMemebrs,
-  onFilterUpdate
+  onFilterUpdate,
+  chunkedTeamMembers,
 });
 </script>
 <style lang="scss">
-@import '@/assets/scss/variables.scss';
-.page-title{
+@import "@/assets/scss/variables.scss";
+.page-title {
   background-color: $page-block-bg;
   text-align: left;
   padding: 18px 35px;
   border: 1px solid $table-border-color;
 }
-.page-content{
+.page-content {
   padding: 0 20px;
 }
-.page-items{
+.page-items {
   display: grid;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  &::-webkit-scrollbar { 
-    display: none; 
+  &::-webkit-scrollbar {
+    display: none;
   }
-  &.list{
+  &.list {
     grid-template-columns: repeat(1, 1fr);
     gap: 0px;
   }
 }
-.page-items__header{
+.page-items__header {
   background-color: $table-header-color;
   border: 1px solid $table-border-color;
   border-radius: 4px;
-  &.q-item{
+  &.q-item {
     min-height: 40px;
     padding-top: 0;
     padding-bottom: 0;
   }
-  .th{
+  .th {
     width: calc(100% / 5);
     font-style: italic;
     letter-spacing: -1px;
     text-align: left;
     color: $dark-grey;
     padding: 0 5px;
-    &:nth-child(1){
+    &:nth-child(1) {
       width: 40px;
     }
-    &:nth-child(2){
+    &:nth-child(2) {
       width: 29%;
     }
-    &:nth-child(3){
+    &:nth-child(3) {
       width: 24%;
     }
-    &:nth-child(4){
+    &:nth-child(4) {
       width: 15%;
     }
-    &:nth-child(5){
+    &:nth-child(5) {
       width: 20%;
     }
   }
