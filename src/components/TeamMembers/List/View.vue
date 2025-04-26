@@ -14,14 +14,13 @@
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div v-show="!loading">
+      <div class="virtual-scroll__wrapper" v-show="!loading">
         <q-virtual-scroll
           ref="virtualScrollRef"
           :items="chunkedTeamMembers"
           :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
           class="page-items"
           :class="gridType"
-          style="height: calc(100vh - 195px); overflow-y: auto"
         >
           <template #default="scope">
             <div
@@ -188,6 +187,8 @@ defineExpose({
   padding: 0 20px;
 }
 .page-items {
+  height: calc(100vh - 195px);
+  overflow-y: auto;
   display: grid;
   -ms-overflow-style: none;
   scrollbar-width: none;

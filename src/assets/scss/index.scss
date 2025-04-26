@@ -91,6 +91,32 @@ body{
 			margin-bottom: 8px;
 		}
 	}
+	// body,
+	// #app,
+	// .q-layout,
+	// .q-page-container,
+	// .main-conatiner,
+	// .page-content,
+	// .virtual-scroll__wrapper{
+	// 	height: 100%;
+	// }
+	.page-items {
+		height: 800px;
+		// display: flex;
+		// flex-direction: column;
+		// .page-items {
+		// 	flex: 1 1 auto;
+		// 	min-height: 0;
+		// 	overflow-y: auto;
+		// 	display: grid;
+		// 	-ms-overflow-style: none;
+		// 	scrollbar-width: none;
+
+		// 	&::-webkit-scrollbar { 
+		// 	display: none; 
+		// 	}
+		// }
+	}
 }
 
 @media (min-width: 511px) {
