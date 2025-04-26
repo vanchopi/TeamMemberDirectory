@@ -171,7 +171,9 @@ const getTeamMemebrs = async (): any => {
 const forceRerenderVirtualScroll = async (): void => {
   await nextTick();
   // proxy?.$forceUpdate();
-  virtualScrollRef.value?.reset();
+  setTimeout(() => {
+    virtualScrollRef.value?.reset();
+  }, 0);
 };
 
 onMounted(async () => {
