@@ -1,5 +1,5 @@
 <template>
-  <!-- <q-card flat class="item" :class="setRowClass()">
+  <q-card flat class="item" :class="setRowClass()">
     <q-item clickable @click="onShowInfo()">
       <q-item-section avatar>
         <AvatarPresentation :entity="teamMember.avatar" />
@@ -13,8 +13,7 @@
     <q-card-section class="items-skills__wrapper" horizontal>
       <SkillsPresentation :entity="teamMember.skills" />
     </q-card-section>
-  </q-card> -->
-  <div style="border: 1px solid red">DEBUG: {{ teamMember.name }}</div>
+  </q-card>
 </template>
 
 <script setup lang="ts">

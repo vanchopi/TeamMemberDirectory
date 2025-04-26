@@ -23,33 +23,36 @@
           :class="gridType"
         >
           <template #default="scope">
-            <div
-              v-if="scope?.item && gridType === 'grid'"
-              class="row q-col-gutter-md q-mb-md"
-            >
-              <div
-                class="col-md-4 col-sm-6 col-xs-12"
-                v-for="member in scope.item"
-                :key="member?.id"
-              >
-                <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
+            <template v-if="Array.isArray(scope.item)">
+              <div class="row q-col-gutter-md q-mb-md">
+                <div
+                  v-for="member in scope.item"
+                  :key="member?.id"
+                  class="col-md-4 col-sm-6 col-xs-12"
+                >
+                  <TeamMembersItem
+                    :teamMember="member"
+                    @show-info="onShowInfo"
+                  />
+                </div>
               </div>
-            </div>
-            <div v-else-if="scope?.item">
+            </template>
+            <template v-else>
               <q-item
                 class="page-items__header flex justify-start items-center"
-                v-if="index === 0"
+                v-if="scope.index === 0"
               >
                 <div v-for="name in tableNames" :key="`th-${name}`" class="th">
                   {{ name }}
                 </div>
               </q-item>
               <TeamMembersItem
-                :teamMember="scope?.item"
-                :key="scope?.item?.id"
+                v-if="scope.item"
+                :teamMember="scope.item"
+                :key="scope.item?.id"
                 @show-info="onShowInfo"
               />
-            </div>
+            </template>
           </template>
         </q-virtual-scroll>
       </div>
