@@ -10,44 +10,6 @@
         :loading="filterLoading"
         @update="onFilterUpdate"
       />
-      <!-- <q-virtual-scroll
-        ref="virtualScrollRef"
-        :items="mockTeamMembers"
-        :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
-        class="page-items"
-        :class="gridType"
-        :key="rerender"
-      >
-        <template #default="scope">
-          <div
-            v-if="scope?.item && !gridType === 'grid'"
-            class="row q-col-gutter-md q-mb-md"
-          >
-            <div
-              class="col-md-4 col-sm-6 col-xs-12"
-              v-for="member in scope.item"
-              :key="member?.id"
-            >
-              <TeamMembersItem :teamMember="member" @show-info="onShowInfo" />
-            </div>
-          </div>
-          <div v-else-if="scope?.item">
-            <q-item
-              class="page-items__header flex justify-start items-center"
-              v-if="index === 0"
-            >
-              <div v-for="name in tableNames" :key="`th-${name}`" class="th">
-                {{ name }}
-              </div>
-            </q-item>
-            <TeamMembersItem
-              :teamMember="scope?.item"
-              :key="scope?.item?.id"
-              @show-info="onShowInfo"
-            />
-          </div>
-        </template>
-      </q-virtual-scroll> -->
       <transition
         appear
         enter-active-class="animated fadeIn"
@@ -59,14 +21,14 @@
         >
           <q-virtual-scroll
             ref="virtualScrollRef"
-            :items="mockTeamMembers"
+            :items="chunkedTeamMembers"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
             class="page-items"
             :class="gridType"
           >
             <template #default="scope">
               <div
-                v-if="scope?.item && !gridType === 'grid'"
+                v-if="scope?.item && gridType === 'grid'"
                 class="row q-col-gutter-md q-mb-md"
               >
                 <div
@@ -216,13 +178,8 @@ watch(
   async (): void => {
     filteredteamMembers.value = teamMembersList.value;
     await nextTick();
+    await nextTick();
     rerender.value++;
-    // if (
-    //   virtualScrollRef.value &&
-    //   typeof virtualScrollRef.value.refresh === "function"
-    // ) {
-    //   virtualScrollRef.value.refresh();
-    // }
   },
   { deep: true }
 );
