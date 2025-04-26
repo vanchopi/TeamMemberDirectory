@@ -168,7 +168,7 @@ const getTeamMemebrs = async (): any => {
   }
 };
 
-const forceRerenderVirtualScroll = async (): void => {
+const forceRerenderVirtualScroll = async (): Promise<void> => {
   await nextTick();
   // proxy?.$forceUpdate();
   setTimeout(() => {
@@ -178,15 +178,24 @@ const forceRerenderVirtualScroll = async (): void => {
 
 onMounted(async () => {
   await getTeamMemebrs();
+  const stopWatching = watch(
+    () => chunkedTeamMembers.value,
+    async (newVal) => {
+      if (newVal && newVal.length > 0) {
+        await forceRerenderVirtualScroll();
+        stopWatching();
+      }
+    },
+    { immediate: true }
+  );
 });
 
 watch(
   (): void => teamMembersList.value,
-  async (): void => {
+  (): void => {
     filteredteamMembers.value = teamMembersList.value;
-    await forceRerenderVirtualScroll();
   },
-  { immediate: true, deep: true }
+  { deep: true }
 );
 
 const maxSize = 10000;
