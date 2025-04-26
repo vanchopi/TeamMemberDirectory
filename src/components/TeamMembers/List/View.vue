@@ -16,6 +16,7 @@
     >
       <div v-show="!loading">
         <q-virtual-scroll
+          ref="virtualScrollRef"
           :items="chunkedTeamMembers"
           :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
           class="page-items"
@@ -66,13 +67,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+} from "vue";
 import { useStore } from "vuex";
 import { TeamMember, TeamMembersFilter } from "@/types/teamMembers";
 import Filter from "@/components/TeamMembers/Filter/TeamMembersFilter.vue";
 import TeamMembersItem from "@/components/TeamMembers/Item/TeamMembersItem.vue";
 import TeamMemberInfo from "@/components/TeamMembers/PopUps/TeamMemberInfo.vue";
 import { useResponsiveGrid } from "@/composables/useResponsiveGrid";
+import { ref as vueRef } from "vue";
+import { QVirtualScroll } from "quasar";
 import { filterBy } from "@/utils/filter";
 import { chunkArray } from "@/utils/helpers";
 
@@ -85,6 +95,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { columnsPerRow, itemHeight } = useResponsiveGrid();
+
+const virtualScrollRef = vueRef<InstanceType<typeof QVirtualScroll>>();
 
 const store = useStore();
 
@@ -145,8 +157,15 @@ const setDefautData = ((): void => {
 
 watch(
   (): void => teamMembersList.value,
-  (): void => {
+  async (): void => {
     filteredteamMembers.value = teamMembersList.value;
+    await nextTick();
+    if (
+      virtualScrollRef.value &&
+      typeof virtualScrollRef.value.refresh === "function"
+    ) {
+      virtualScrollRef.value.refresh();
+    }
   },
   { deep: true }
 );
