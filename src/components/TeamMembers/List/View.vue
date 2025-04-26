@@ -23,7 +23,7 @@
           :class="gridType"
         >
           <template #default="scope">
-            <template v-if="Array.isArray(scope.item)">
+            <!-- <template v-if="Array.isArray(scope.item)">
               <div class="row q-col-gutter-md q-mb-md">
                 <div
                   v-for="member in scope.item"
@@ -52,7 +52,10 @@
                 :key="scope.item?.id"
                 @show-info="onShowInfo"
               />
-            </template>
+            </template> -->
+            <div style="border: 1px solid red">
+              DEBUG: {{ scope.item.name }}
+            </div>
           </template>
         </q-virtual-scroll>
       </div>
