@@ -27,6 +27,7 @@
       :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
       class="page-items"
       :class="gridType"
+      :key="rerender"
     >
       <template #default="scope">
         <div
@@ -168,6 +169,7 @@ const filteredteamMembers = ref<TeamMember[]>([]);
 const tableNames: string[] = ["", "Name", "Position", "Department", "Skills"];
 const loading = ref<boolean>(false);
 const filterLoading = ref<boolean>(false);
+const rerender = ref<number>(0);
 
 const onShowInfo = (teamMember: TeamMember): void => {
   showInfo.value = true;
@@ -213,12 +215,13 @@ watch(
   async (): void => {
     filteredteamMembers.value = teamMembersList.value;
     await nextTick();
-    if (
-      virtualScrollRef.value &&
-      typeof virtualScrollRef.value.refresh === "function"
-    ) {
-      virtualScrollRef.value.refresh();
-    }
+    rerender.value++;
+    // if (
+    //   virtualScrollRef.value &&
+    //   typeof virtualScrollRef.value.refresh === "function"
+    // ) {
+    //   virtualScrollRef.value.refresh();
+    // }
   },
   { deep: true }
 );
