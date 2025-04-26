@@ -189,7 +189,8 @@ defineExpose({
   padding: 0 20px;
 }
 .page-items {
-  height: calc(100vh - 195px);
+  height: calc(var(--vh, 1vh) * 100 - 195px);
+  min-height: 400px;
   overflow-y: auto;
   display: grid;
   -ms-overflow-style: none;

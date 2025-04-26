@@ -6,6 +6,7 @@ import settings from "./utils/axios/settings";
 import { Quasar } from "quasar";
 import quasarUserOptions from "./quasar-user-options";
 import "@/assets/scss/index.scss";
+import "./utils/viewportHeight";
 
 settings();
 

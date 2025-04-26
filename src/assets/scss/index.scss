@@ -91,17 +91,17 @@ body{
 			margin-bottom: 8px;
 		}
 	}
-	// body,
-	// #app,
-	// .q-layout,
-	// .q-page-container,
-	// .main-conatiner,
-	// .page-content,
-	// .virtual-scroll__wrapper{
-	// 	height: 100%;
-	// }
+	body,
+	#app,
+	.q-layout,
+	.q-page-container,
+	.main-conatiner,
+	.page-content,
+	.virtual-scroll__wrapper{
+		height: 100%;
+	}
 	.page-items {
-		// height: 800px;
+		min-height: 500px;
 		// display: flex;
 		// flex-direction: column;
 		// .page-items {
