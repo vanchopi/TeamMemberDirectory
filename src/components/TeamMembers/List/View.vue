@@ -20,7 +20,6 @@
           v-if="chunkedTeamMembers.length > 0"
         >
           <q-virtual-scroll
-            v-if="chunkedTeamMembers.length > 0"
             ref="virtualScrollRef"
             :items-size="chunkedTeamMembers.length"
             :items-fn="getItems"
@@ -145,6 +144,9 @@ const onFilterUpdate = (filter: TeamMembersFilter): void => {
   filterBy<TeamMembersFilter, TeamMember>(filter, teamMembersList.value)
     .then((filtered) => {
       filteredteamMembers.value = filtered;
+      nextTick().then(() => {
+        resetVirtualScroll();
+      });
     })
     .catch((e) => {
       console.log(e);
@@ -172,6 +174,13 @@ const getItems = (from: number, size: number): any[] => {
     arr.push(chunkedTeamMembers.value[from + i]);
   }
   return Object.freeze(arr);
+};
+
+const resetVirtualScroll = async (): Promise<void> => {
+  await nextTick();
+  setTimeout(() => {
+    virtualScrollRef.value?.reset();
+  }, 0);
 };
 
 onMounted(async () => {
