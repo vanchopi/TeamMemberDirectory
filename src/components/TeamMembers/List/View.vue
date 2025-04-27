@@ -25,15 +25,8 @@
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
             class="page-items"
             :class="gridType"
-            v-slot="{ index }"
           >
-            <q-item :key="index" dense>
-              <q-item-section>
-                <q-item-label> #{{ index }} </q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <!-- <template #default="scope">
+            <template #default="scope">
               <div
                 v-if="scope?.item && gridType === 'grid'"
                 class="row q-col-gutter-md q-mb-md"
@@ -68,7 +61,7 @@
                   @show-info="onShowInfo"
                 />
               </div>
-            </template> -->
+            </template>
           </q-virtual-scroll>
         </div>
       </transition>
