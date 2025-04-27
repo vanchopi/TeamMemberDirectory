@@ -14,13 +14,19 @@ export function reviewData<T>(arr: T[]): T[] {
     );
 }
 
-export function chunkArray<T>(arr: T[], chunkSize: number): T[][] {
-  const result: T[][] = [];
+export function chunkArray<T>(
+  arr: T[],
+  chunkSize: number
+): { id: number; data: T[] }[] {
+  const result: { id: number; data: T[] }[] = [];
   if (!chunkSize || chunkSize <= 0) {
-    return [arr];
+    return [{ id: 0, data: arr }];
   }
   for (let i = 0; i < arr.length; i += chunkSize) {
-    result.push(arr.slice(i, i + chunkSize));
+    result.push({
+      id: i / chunkSize,
+      data: arr.slice(i, i + chunkSize),
+    });
   }
   return result;
 }
