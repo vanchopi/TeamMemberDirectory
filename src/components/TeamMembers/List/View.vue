@@ -17,11 +17,13 @@
       >
         <div
           class="virtual-scroll__wrapper"
-          v-show="chunkedTeamMembers.length > 0"
+          v-if="chunkedTeamMembers.length > 0"
         >
           <q-virtual-scroll
+            v-if="chunkedTeamMembers.length > 0"
             ref="virtualScrollRef"
-            :items="chunkedTeamMembers"
+            :items-size="chunkedTeamMembers.length"
+            :items-fn="getItems"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
             class="page-items"
             :class="gridType"
@@ -162,6 +164,14 @@ const getTeamMemebrs = async (): any => {
   } finally {
     loading.value = false;
   }
+};
+
+const getItems = (from: number, size: number): any[] => {
+  const arr: any[] = [];
+  for (let i = 0; i < size; i++) {
+    arr.push(chunkedTeamMembers.value[from + i]);
+  }
+  return Object.freeze(arr);
 };
 
 onMounted(async () => {
