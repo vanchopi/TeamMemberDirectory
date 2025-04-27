@@ -22,6 +22,7 @@
           <q-virtual-scroll
             v-if="chunkedTeamMembers.length > 0"
             ref="virtualScrollRef"
+            :key="rerender"
             :items="chunkedTeamMembers"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
             class="page-items"
@@ -98,6 +99,7 @@ import { QVirtualScroll } from "quasar";
 import { filterBy } from "@/utils/filter";
 import { chunkArray } from "@/utils/helpers";
 import { getCurrentInstance } from "vue";
+import { successMessage } from "@/utils/notifications";
 
 interface Props {
   service: any;
@@ -172,8 +174,10 @@ const forceRerenderVirtualScroll = async (): Promise<void> => {
   await nextTick();
   // proxy?.$forceUpdate();
   setTimeout(() => {
-    virtualScrollRef.value?.reset();
-  }, 0);
+    // virtualScrollRef.value?.reset();
+    rerender.value++;
+    successMessage(chunkedTeamMembers.value.length);
+  }, 3000);
 };
 
 onMounted(async () => {
