@@ -65,8 +65,19 @@ body{
 }
 
 @media (min-width: 0px) {
-	.page-content .page-items.list .item{
+	.page-content .page-items.list .item,
+	.page-items__header .q-item{
 		min-width: 600px;
+	}
+	.page-items__header{
+		overflow-y: auto;
+		.q-item{
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+			&::-webkit-scrollbar {
+				display: none;
+			}
+		}
 	}
 }
 

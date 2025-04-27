@@ -19,26 +19,25 @@
           class="virtual-scroll__wrapper"
           v-if="filteredteamMembers.length > 0"
         >
-          <q-item
-            class="page-items__header flex justify-start items-center"
-            v-if="gridType === 'list'"
-          >
-            <div v-for="name in tableNames" :key="`th-${name}`" class="th">
-              {{ name }}
-            </div>
-          </q-item>
+          <div v-if="!isGrid" class="page-items__header">
+            <q-item class="flex justify-start items-center">
+              <div v-for="name in tableNames" :key="`th-${name}`" class="th">
+                {{ name }}
+              </div>
+            </q-item>
+          </div>
           <q-virtual-scroll
             ref="virtualScrollRef"
             :items-size="filteredteamMembers.length"
             :items-fn="getItems"
-            :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
+            :virtual-scroll-item-size="isGrid ? itemHeight : 90"
             class="page-items"
             :class="gridType"
             @virtual-scroll="onVirtualScroll"
           >
             <template #default="scope">
               <div
-                v-if="scope?.item && gridType === 'grid'"
+                v-if="scope?.item && isGrid"
                 class="row q-col-gutter-md q-mb-md"
               >
                 <div
@@ -110,12 +109,14 @@ const virtualScrollRef = vueRef<InstanceType<typeof QVirtualScroll>>();
 
 const store = useStore();
 
+const isGrid = computed<boolean>(() => gridType.value === "grid");
+
 const teamMembersList = computed<TeamMember[]>(() => {
   return store?.state.teamMembers.teamMembers;
 });
 
 const chunkedTeamMembers = computed(() => {
-  return gridType.value === "grid"
+  return isGrid.value
     ? chunkArray(filteredteamMembers.value, columnsPerRow.value)
     : filteredteamMembers.value;
 });
@@ -223,7 +224,7 @@ defineExpose({
   background-color: $table-header-color;
   border: 1px solid $table-border-color;
   border-radius: 4px;
-  &.q-item {
+  .q-item {
     min-height: 40px;
     padding-top: 0;
     padding-bottom: 0;
