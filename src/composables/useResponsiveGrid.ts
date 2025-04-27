@@ -1,4 +1,4 @@
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 export function useResponsiveGrid() {
   const columnsPerRow = ref<number>(3);
@@ -9,10 +9,10 @@ export function useResponsiveGrid() {
 
     if (width <= 510) {
       columnsPerRow.value = 1;
-      itemHeight.value = 150;
+      itemHeight.value = 166;
     } else if (width <= 680) {
       columnsPerRow.value = 2;
-      itemHeight.value = 190;
+      itemHeight.value = 221;
     } else {
       columnsPerRow.value = 3;
       itemHeight.value = 221;
@@ -21,15 +21,15 @@ export function useResponsiveGrid() {
 
   onMounted(() => {
     update();
-    window.addEventListener('resize', update);
+    window.addEventListener("resize", update);
   });
 
   onBeforeUnmount(() => {
-    window.removeEventListener('resize', update);
+    window.removeEventListener("resize", update);
   });
 
   return {
     columnsPerRow,
-    itemHeight
+    itemHeight,
   };
 }

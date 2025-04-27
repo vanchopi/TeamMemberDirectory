@@ -26,40 +26,6 @@
               </div>
             </q-item>
           </div>
-          <!-- <q-virtual-scroll
-            ref="virtualScrollRef"
-            :items-size="chunkedTeamMembers.length"
-            :items-fn="getItems"
-            :virtual-scroll-item-size="isGrid ? itemHeight : 90"
-            class="page-items"
-            :class="gridType"
-            @virtual-scroll="onVirtualScroll"
-          >
-            <template #default="scope">
-              <div
-                v-if="scope?.item && isGrid"
-                class="row q-col-gutter-md q-mb-md"
-              >
-                <div
-                  class="col-md-4 col-sm-6 col-xs-12"
-                  v-for="member in scope.item"
-                  :key="member?.id"
-                >
-                  <TeamMembersItem
-                    :teamMember="member"
-                    @show-info="onShowInfo"
-                  />
-                </div>
-              </div>
-              <div v-else-if="scope?.item">
-                <TeamMembersItem
-                  :teamMember="scope?.item"
-                  :key="scope?.item?.id"
-                  @show-info="onShowInfo"
-                />
-              </div>
-            </template>
-          </q-virtual-scroll> -->
           <RecycleScroller
             ref="scrollerRef"
             :items="chunkedTeamMembers"
@@ -69,7 +35,7 @@
             :class="gridType"
           >
             <template #default="{ item }">
-              <div v-if="isGrid" class="row q-col-gutter-md q-mb-md">
+              <div v-if="isGrid" class="row q-col-gutter-md q-pb-md">
                 <div
                   class="col-md-4 col-sm-6 col-xs-12"
                   v-for="member in item.data"
@@ -119,7 +85,6 @@ import { ref as vueRef } from "vue";
 import { QVirtualScroll } from "quasar";
 import { filterBy } from "@/utils/filter";
 import { chunkArray } from "@/utils/helpers";
-import { successMessage } from "@/utils/notifications";
 import { RecycleScroller } from "vue-virtual-scroller";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
@@ -133,20 +98,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { columnsPerRow, itemHeight } = useResponsiveGrid();
 
-const virtualScrollRef = vueRef<InstanceType<typeof QVirtualScroll>>();
-
 const store = useStore();
 
 const isGrid = computed<boolean>(() => gridType.value === "grid");
-const scrollerRef = ref<InstanceType<typeof RecycleScroller>>();
-
-const scrollToTop = () => {
-  scrollerRef.value?.scrollToItem(0, true); // к первому элементу с анимацией
-};
-
-const scrollToIndex = (index: number) => {
-  scrollerRef.value?.scrollToItem(index, true); // к конкретному элементу
-};
 
 const teamMembersList = computed<TeamMember[]>(() => {
   return store?.state.teamMembers.teamMembers;
@@ -161,6 +115,8 @@ const chunkedTeamMembers = computed(() => {
 const gridType = computed<string>(() => {
   return store?.state.teamMembers.gridType;
 });
+
+const scrollerRef = ref<InstanceType<typeof RecycleScroller>>();
 
 const showInfo = ref<boolean>(false);
 const activeTeamMember = ref<TeamMember>({});
@@ -203,17 +159,12 @@ const getTeamMemebrs = async (): any => {
   }
 };
 
-const getItems = (from: number, size: number): any[] => {
-  const arr: any[] = [];
-  for (let i = 0; i < size; i++) {
-    arr.push(chunkedTeamMembers.value[from + i]);
-  }
-  return Object.freeze(arr);
+const scrollToTop = (): void => {
+  scrollerRef.value?.scrollToItem(0, true);
 };
 
-const onVirtualScroll = (details: any) => {
-  // successMessage("scroll resized");
-  // console.log(details);
+const scrollToIndex = (index: number): void => {
+  scrollerRef.value?.scrollToItem(index, true);
 };
 
 onMounted(async () => {

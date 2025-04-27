@@ -113,20 +113,11 @@ body{
 	}
 	.page-items {
 		min-height: 500px;
-		// display: flex;
-		// flex-direction: column;
-		// .page-items {
-		// 	flex: 1 1 auto;
-		// 	min-height: 0;
-		// 	overflow-y: auto;
-		// 	display: grid;
-		// 	-ms-overflow-style: none;
-		// 	scrollbar-width: none;
-
-		// 	&::-webkit-scrollbar { 
-		// 	display: none; 
-		// 	}
-		// }
+	}
+}
+@media (max-width: 680px) {
+	.page-items.list .vue-recycle-scroller__item-wrapper{
+		min-width: 600px;
 	}
 }
 

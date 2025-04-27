@@ -68,6 +68,9 @@ describe("TeamMemberList", () => {
     const wrapper = await mountTeamMemberList();
 
     const chunkedItems = (wrapper.vm as any).chunkedTeamMembers;
+    await flushPromises();
+    await nextTick();
+    console.log("----", wrapper.html());
 
     expect(chunkedItems.value.length).toBeGreaterThan(0);
     expect(chunkedItems.value.length).toBe(mockTeamMembers.length);
