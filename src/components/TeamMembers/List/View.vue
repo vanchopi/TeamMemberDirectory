@@ -28,7 +28,17 @@
             :class="gridType"
           >
             <template #default="scope">
-              <div style="border: 1px solid red">DEBUG: {{ scope.item }}</div>
+              <div style="border: 1px solid red">
+                DEBUG:
+                <div v-if="Array.isArray(scope.item)">
+                  <div v-for="subItem in scope.item" :key="subItem.id">
+                    {{ subItem.name }}
+                  </div>
+                </div>
+                <div v-else>
+                  {{ scope.item.name }}
+                </div>
+              </div>
               <!-- <div
                 v-if="scope?.item && gridType === 'grid'"
                 class="row q-col-gutter-md q-mb-md"
