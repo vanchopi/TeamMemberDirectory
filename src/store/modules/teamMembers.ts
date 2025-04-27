@@ -1,8 +1,8 @@
-import { Module } from 'vuex';
-import { RootState } from '../index';
+import { Module } from "vuex";
+import { RootState } from "../index";
 import TeamMembersService from "@/services/TeamMembers/TeamMembers";
-import { TeamMember, TeamMembersResponse } from '@/types/teamMembers';
-import { reviewData } from '@/utils/helpers';
+import { TeamMember, TeamMembersResponse } from "@/types/teamMembers";
+import { reviewData } from "@/utils/helpers";
 
 const service = new TeamMembersService();
 
@@ -14,7 +14,7 @@ export interface TeamMembersState {
 
 const state: TeamMembersState = {
   teamMembers: [],
-  gridTypes: ["grid", "list"],
+  gridTypes: ["list", "grid"],
   gridType: "",
 };
 
@@ -24,21 +24,23 @@ const mutations = {
   },
   SET_GRID_TYPE(state: TeamMembersState, value: string) {
     state.gridType = value;
-  }
+  },
 };
 
 const actions = {
   async getTeamMembers({ commit }: any): Promise<void> {
     try {
-      const result = await service.get<TeamMembersResponse>('team-members.json');
-      commit('SET_TEAM_MEMBERS', reviewData<TeamMember>(result.data));
+      const result = await service.get<TeamMembersResponse>(
+        "team-members.json"
+      );
+      commit("SET_TEAM_MEMBERS", reviewData<TeamMember>(result.data));
     } catch (e) {
       console.error(e);
     }
   },
   setGridType({ commit }: any, value: string): void {
-    commit('SET_GRID_TYPE', value);
-  }
+    commit("SET_GRID_TYPE", value);
+  },
 };
 
 const teamMembersModule: Module<TeamMembersState, RootState> = {
