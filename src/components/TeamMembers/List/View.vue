@@ -20,7 +20,6 @@
           v-show="chunkedTeamMembers.length > 0"
         >
           <q-virtual-scroll
-            v-if="chunkedTeamMembers.length > 0"
             ref="virtualScrollRef"
             :key="rerender"
             :items="chunkedTeamMembers"
@@ -29,7 +28,10 @@
             :class="gridType"
           >
             <template #default="scope">
-              <div
+              <div style="border: 1px solid red">
+                DEBUG: {{ scope.item.name }}
+              </div>
+              <!-- <div
                 v-if="scope?.item && gridType === 'grid'"
                 class="row q-col-gutter-md q-mb-md"
               >
@@ -62,7 +64,7 @@
                   :key="scope?.item?.id"
                   @show-info="onShowInfo"
                 />
-              </div>
+              </div> -->
             </template>
           </q-virtual-scroll>
         </div>
@@ -174,10 +176,10 @@ const forceRerenderVirtualScroll = async (): Promise<void> => {
   await nextTick();
   // proxy?.$forceUpdate();
   setTimeout(() => {
-    // virtualScrollRef.value?.reset();
+    virtualScrollRef.value?.reset();
     rerender.value++;
-    successMessage(chunkedTeamMembers.value.length);
-  }, 3000);
+    // successMessage(chunkedTeamMembers.value.length);
+  }, 0);
 };
 
 onMounted(async () => {
@@ -201,15 +203,6 @@ watch(
   },
   { deep: true }
 );
-
-const maxSize = 10000;
-const heavyList = [];
-
-for (let i = 0; i < maxSize; i++) {
-  heavyList.push({
-    label: "Option " + (i + 1),
-  });
-}
 
 defineExpose({
   getTeamMemebrs,
