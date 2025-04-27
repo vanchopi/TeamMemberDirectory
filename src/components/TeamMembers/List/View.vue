@@ -21,25 +21,20 @@
         >
           <q-virtual-scroll
             ref="virtualScrollRef"
-            :key="rerender"
             :items="chunkedTeamMembers"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
             class="page-items"
             :class="gridType"
+            v-slot="{ index }"
           >
-            <template #default="scope">
-              <div style="border: 1px solid red">
-                DEBUG:
-                <div v-if="Array.isArray(scope.item)">
-                  <div v-for="subItem in scope.item" :key="subItem.id">
-                    {{ subItem.name }}
-                  </div>
-                </div>
-                <div v-else>
-                  {{ scope.item.name }}
-                </div>
-              </div>
-              <!-- <div
+            <q-item :key="index" dense>
+              <q-item-section>
+                <q-item-label> #{{ index }} </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <!-- <template #default="scope">
+              <div
                 v-if="scope?.item && gridType === 'grid'"
                 class="row q-col-gutter-md q-mb-md"
               >
@@ -72,8 +67,8 @@
                   :key="scope?.item?.id"
                   @show-info="onShowInfo"
                 />
-              </div> -->
-            </template>
+              </div>
+            </template> -->
           </q-virtual-scroll>
         </div>
       </transition>
@@ -108,7 +103,6 @@ import { ref as vueRef } from "vue";
 import { QVirtualScroll } from "quasar";
 import { filterBy } from "@/utils/filter";
 import { chunkArray } from "@/utils/helpers";
-import { getCurrentInstance } from "vue";
 import { successMessage } from "@/utils/notifications";
 
 interface Props {
@@ -120,8 +114,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { columnsPerRow, itemHeight } = useResponsiveGrid();
-
-const { proxy } = getCurrentInstance()!;
 
 const virtualScrollRef = vueRef<InstanceType<typeof QVirtualScroll>>();
 
@@ -147,7 +139,6 @@ const filteredteamMembers = ref<TeamMember[]>([]);
 const tableNames: string[] = ["", "Name", "Position", "Department", "Skills"];
 const loading = ref<boolean>(false);
 const filterLoading = ref<boolean>(false);
-const rerender = ref<number>(0);
 
 const onShowInfo = (teamMember: TeamMember): void => {
   showInfo.value = true;
@@ -183,19 +174,6 @@ const getTeamMemebrs = async (): any => {
 onMounted(async () => {
   await getTeamMemebrs();
 });
-
-const alreadyTriggered = ref(false);
-
-watch(
-  () => chunkedTeamMembers.value,
-  (newVal) => {
-    if (!alreadyTriggered.value && newVal && newVal.length > 0) {
-      rerender.value++;
-      alreadyTriggered.value = true;
-    }
-  },
-  { immediate: true }
-);
 
 watch(
   (): void => teamMembersList.value,
