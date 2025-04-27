@@ -28,9 +28,7 @@
             :class="gridType"
           >
             <template #default="scope">
-              <div style="border: 1px solid red">
-                DEBUG: {{ scope.item.name }}
-              </div>
+              <div style="border: 1px solid red">DEBUG: {{ scope.item }}</div>
               <!-- <div
                 v-if="scope?.item && gridType === 'grid'"
                 class="row q-col-gutter-md q-mb-md"
@@ -172,29 +170,22 @@ const getTeamMemebrs = async (): any => {
   }
 };
 
-const forceRerenderVirtualScroll = async (): Promise<void> => {
-  await nextTick();
-  // proxy?.$forceUpdate();
-  setTimeout(() => {
-    virtualScrollRef.value?.reset();
-    rerender.value++;
-    // successMessage(chunkedTeamMembers.value.length);
-  }, 0);
-};
-
 onMounted(async () => {
   await getTeamMemebrs();
-  const stopWatching = watch(
-    () => chunkedTeamMembers.value,
-    async (newVal) => {
-      if (newVal && newVal.length > 0) {
-        await forceRerenderVirtualScroll();
-        stopWatching();
-      }
-    },
-    { immediate: true }
-  );
 });
+
+const alreadyTriggered = ref(false);
+
+watch(
+  () => chunkedTeamMembers.value,
+  (newVal) => {
+    if (!alreadyTriggered.value && newVal && newVal.length > 0) {
+      rerender.value++;
+      alreadyTriggered.value = true;
+    }
+  },
+  { immediate: true }
+);
 
 watch(
   (): void => teamMembersList.value,
