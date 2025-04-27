@@ -17,15 +17,24 @@
       >
         <div
           class="virtual-scroll__wrapper"
-          v-if="chunkedTeamMembers.length > 0"
+          v-if="filteredteamMembers.length > 0"
         >
+          <q-item
+            class="page-items__header flex justify-start items-center"
+            v-if="gridType === 'list'"
+          >
+            <div v-for="name in tableNames" :key="`th-${name}`" class="th">
+              {{ name }}
+            </div>
+          </q-item>
           <q-virtual-scroll
             ref="virtualScrollRef"
-            :items-size="chunkedTeamMembers.length"
+            :items-size="filteredteamMembers.length"
             :items-fn="getItems"
             :virtual-scroll-item-size="gridType === 'grid' ? itemHeight : 90"
             class="page-items"
             :class="gridType"
+            @virtual-scroll="onVirtualScroll"
           >
             <template #default="scope">
               <div
@@ -44,18 +53,6 @@
                 </div>
               </div>
               <div v-else-if="scope?.item">
-                <q-item
-                  class="page-items__header flex justify-start items-center"
-                  v-if="index === 0"
-                >
-                  <div
-                    v-for="name in tableNames"
-                    :key="`th-${name}`"
-                    class="th"
-                  >
-                    {{ name }}
-                  </div>
-                </q-item>
                 <TeamMembersItem
                   :teamMember="scope?.item"
                   :key="scope?.item?.id"
@@ -144,9 +141,6 @@ const onFilterUpdate = (filter: TeamMembersFilter): void => {
   filterBy<TeamMembersFilter, TeamMember>(filter, teamMembersList.value)
     .then((filtered) => {
       filteredteamMembers.value = filtered;
-      nextTick().then(() => {
-        resetVirtualScroll();
-      });
     })
     .catch((e) => {
       console.log(e);
@@ -176,11 +170,9 @@ const getItems = (from: number, size: number): any[] => {
   return Object.freeze(arr);
 };
 
-const resetVirtualScroll = async (): Promise<void> => {
-  await nextTick();
-  setTimeout(() => {
-    virtualScrollRef.value?.reset();
-  }, 0);
+const onVirtualScroll = (details: any) => {
+  // successMessage("scroll resized");
+  // console.log(details);
 };
 
 onMounted(async () => {

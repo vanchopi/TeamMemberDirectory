@@ -14,7 +14,7 @@ export interface TeamMembersState {
 
 const state: TeamMembersState = {
   teamMembers: [],
-  gridTypes: ["grid", "list"],
+  gridTypes: ["list", "grid"],
   gridType: "",
 };
 
