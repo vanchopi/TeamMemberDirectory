@@ -39,6 +39,12 @@ async function mountTeamMemberList() {
   const wrapper = mount(TeamMemberList, {
     global: {
       plugins: [[Quasar, {}]],
+      stubs: {
+        transition: false,
+        // RecycleScroller: {
+        //   template: '<div><slot /></div>',
+        // },
+      },
     },
     props: { service },
   });
@@ -48,13 +54,16 @@ async function mountTeamMemberList() {
   await nextTick();
   await flushPromises();
   await nextTick();
-
   return wrapper;
 }
 
 describe("TeamMemberList", () => {
   beforeEach(() => {
     teamMembers.value = [];
+    Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+      configurable: true,
+      value: 9999,
+    });
     createMockStore();
   });
 
@@ -68,10 +77,18 @@ describe("TeamMemberList", () => {
     const wrapper = await mountTeamMemberList();
 
     const chunkedItems = (wrapper.vm as any).chunkedTeamMembers;
+
     await flushPromises();
     await nextTick();
-    console.log("----", wrapper.html());
 
+    const vScroll = wrapper.findComponent({ name: "RecycleScroller" });
+
+    const header = wrapper.find(".page-items__header");
+    expect(header.exists()).toBe(true);
+
+    const scrollerItems = vScroll.props("items");
+
+    expect(scrollerItems.value.length).toBe(mockTeamMembers.length);
     expect(chunkedItems.value.length).toBeGreaterThan(0);
     expect(chunkedItems.value.length).toBe(mockTeamMembers.length);
 

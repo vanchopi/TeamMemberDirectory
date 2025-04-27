@@ -17,7 +17,7 @@
       >
         <div
           class="virtual-scroll__wrapper"
-          v-if="chunkedTeamMembers.length > 0"
+          v-show="chunkedTeamMembers.length > 0"
         >
           <div v-if="!isGrid" class="page-items__header">
             <q-item class="flex justify-start items-center">
